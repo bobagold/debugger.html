@@ -76,7 +76,21 @@ class Tabs extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    window.requestIdleCallback(this.updateHiddenTabs);
+    const requestIdleCallback =
+      window.requestIdleCallback ||
+      function(handler) {
+        const startTime = Date.now();
+
+        return window.setTimeout(function() {
+          handler({
+            didTimeout: false,
+            timeRemaining: function() {
+              return Math.max(0, 50.0 - (Date.now() - startTime));
+            }
+          });
+        }, 1);
+      };
+    requestIdleCallback(this.updateHiddenTabs);
     window.addEventListener("resize", this.onResize);
   }
 
